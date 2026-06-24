@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="it" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StepSnap 📸 - Documentazione Processi</title>
+  <title>StepSnap - Documentazione Processi</title>
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#7c3aed">
@@ -11,12 +12,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="StepSnap">
   <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="icon" type="image/png" href="icon-512.png">
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
   <!-- HEADER PRINCIPALE -->
@@ -28,18 +31,34 @@
         <p>Documentazione Processi Semplificata</p>
       </div>
     </div>
-    
+
     <div class="header-actions">
       <button class="btn btn-install btn-sm hidden" id="btnInstallApp" title="Installa StepSnap come app">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
         Installa App
       </button>
       <button class="btn btn-secondary btn-sm" id="btnDashboard">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9"></rect>
+          <rect x="14" y="3" width="7" height="5"></rect>
+          <rect x="14" y="12" width="7" height="9"></rect>
+          <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
         Le mie Guide
       </button>
       <button class="btn btn-secondary btn-sm" id="btnHelp">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
         Istruzioni
       </button>
       <div class="theme-toggle">
@@ -56,12 +75,13 @@
   <div class="save-toast" id="saveToast">Modifiche salvate!</div>
 
   <main class="app-container">
-    
+
     <!-- DASHBOARD (VISIBILE ALL'AVVIO O SE NESSUNA GUIDA È ATTIVA) -->
     <section class="dashboard-section active" id="dashboardSection">
       <div class="dashboard-hero">
         <h2>Documenta i tuoi processi in pochi clic</h2>
-        <p>Acquisisci schermate dal vivo, annota passaggi chiave con frecce e censura i dati sensibili, quindi esporta un manuale pronto da condividere.</p>
+        <p>Acquisisci schermate dal vivo, annota passaggi chiave con frecce e censura i dati sensibili, quindi esporta
+          un manuale pronto da condividere.</p>
       </div>
 
       <div class="dashboard-grid">
@@ -71,14 +91,20 @@
           <form id="newGuideForm" class="new-guide-form">
             <div class="form-group">
               <label for="guideTitle">Titolo del Processo</label>
-              <input type="text" id="guideTitle" placeholder="Es. Registrazione nuovo utente in SAP" required autocomplete="off">
+              <input type="text" id="guideTitle" placeholder="Es. Registrazione nuovo utente in SAP" required
+                autocomplete="off">
             </div>
             <div class="form-group">
               <label for="guideDesc">Descrizione / Obiettivo</label>
-              <textarea id="guideDesc" rows="3" placeholder="Es. Questa guida descrive la procedura standard per censire una nuova anagrafica cliente sul modulo SD..."></textarea>
+              <textarea id="guideDesc" rows="3"
+                placeholder="Es. Questa guida descrive la procedura standard per censire una nuova anagrafica cliente sul modulo SD..."></textarea>
             </div>
             <button type="submit" class="btn btn-primary btn-block">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
               Inizia a Documentare
             </button>
           </form>
@@ -87,9 +113,15 @@
         <!-- CARICA GUIDA DA JSON -->
         <div class="card upload-guide-card">
           <h3>Importa Progetto</h3>
-          <p>Carica un file di progetto <code>.json</code> esportato in precedenza per continuare a modificarlo o consultarlo.</p>
+          <p>Carica un file di progetto <code>.json</code> esportato in precedenza per continuare a modificarlo o
+            consultarlo.</p>
           <div class="file-upload-zone" id="jsonUploadZone">
-            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
             <p>Trascina il file JSON qui oppure <span class="highlight">sfoglia</span></p>
             <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
           </div>
@@ -114,11 +146,17 @@
       <div class="workspace-header no-print">
         <div class="guide-info-summary">
           <button class="btn-icon" id="btnBackToDashboard" title="Torna alla Dashboard">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
           </button>
           <div class="guide-title-details">
-            <h2 id="activeGuideTitle" contenteditable="true" title="Fai clic per modificare il titolo">Titolo della Guida</h2>
-            <p id="activeGuideDesc" contenteditable="true" title="Fai clic per modificare la descrizione">Descrizione della guida...</p>
+            <h2 id="activeGuideTitle" contenteditable="true" title="Fai clic per modificare il titolo">Titolo della
+              Guida</h2>
+            <p id="activeGuideDesc" contenteditable="true" title="Fai clic per modificare la descrizione">Descrizione
+              della guida...</p>
           </div>
         </div>
         <div class="guide-status">
@@ -129,7 +167,7 @@
       </div>
 
       <div class="workspace-grid">
-        
+
         <!-- 1. SIDEBAR SINISTRA: ELENCO PASSI -->
         <aside class="workspace-sidebar no-print">
           <div class="sidebar-title">
@@ -142,7 +180,11 @@
           </div>
 
           <button class="btn btn-secondary btn-block btn-add-step" id="btnAddEmptyStep">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
             Aggiungi Passo Vuoto
           </button>
         </aside>
@@ -150,9 +192,15 @@
         <!-- 2. AREA CENTRALE: EDITOR PASSAGGIO CORRENTE -->
         <section class="workspace-editor" id="workspaceEditor">
           <div class="empty-editor-state" id="emptyEditorState">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             <h3>Nessun Passaggio Selezionato</h3>
-            <p>Seleziona un passaggio a sinistra o fai clic su "Aggiungi Passo Vuoto" per iniziare a scrivere e annotare.</p>
+            <p>Seleziona un passaggio a sinistra o fai clic su "Aggiungi Passo Vuoto" per iniziare a scrivere e
+              annotare.</p>
           </div>
 
           <div class="step-editor-content hidden" id="stepEditorContent">
@@ -166,7 +214,8 @@
               </div>
               <div class="form-group">
                 <label for="stepDescInput">Descrizione dettagliata (Supporta Markdown elementare)</label>
-                <textarea id="stepDescInput" rows="3" placeholder="Es. Fare doppio clic sull'icona evidenziata in rosso. Nota: se compare un avviso di sicurezza, fare clic su 'Consenti'."></textarea>
+                <textarea id="stepDescInput" rows="3"
+                  placeholder="Es. Fare doppio clic sull'icona evidenziata in rosso. Nota: se compare un avviso di sicurezza, fare clic su 'Consenti'."></textarea>
               </div>
             </div>
 
@@ -175,19 +224,39 @@
               <div class="editor-toolbar">
                 <div class="toolbar-group">
                   <button class="tool-btn active" id="toolSelect" title="Seleziona / Sposta">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
                   </button>
                   <button class="tool-btn" id="toolArrow" title="Disegna Freccia">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                   </button>
                   <button class="tool-btn" id="toolRect" title="Rettangolo Evidenziatore">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    </svg>
                   </button>
                   <button class="tool-btn" id="toolPixel" title="Censura Pixel (Pixelazione)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15.93a8 8 0 0 1-2 0V16h2zm0-4.07h-2v-4h2zm0-6V5.07a8 8 0 0 1 2 0V7z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path
+                        d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15.93a8 8 0 0 1-2 0V16h2zm0-4.07h-2v-4h2zm0-6V5.07a8 8 0 0 1 2 0V7z">
+                      </path>
+                    </svg>
                   </button>
                   <button class="tool-btn" id="toolText" title="Aggiungi Testo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                      <line x1="9" y1="20" x2="15" y2="20"></line>
+                      <line x1="12" y1="4" x2="12" y2="20"></line>
+                    </svg>
                   </button>
                 </div>
 
@@ -196,11 +265,16 @@
                 <div class="toolbar-group">
                   <span class="color-picker-label">Colore:</span>
                   <div class="color-options">
-                    <button class="color-swatch active" style="background-color: #ef4444;" data-color="#ef4444" title="Rosso"></button>
-                    <button class="color-swatch" style="background-color: #f59e0b;" data-color="#f59e0b" title="Arancione"></button>
-                    <button class="color-swatch" style="background-color: #10b981;" data-color="#10b981" title="Verde"></button>
-                    <button class="color-swatch" style="background-color: #3b82f6;" data-color="#3b82f6" title="Blu"></button>
-                    <button class="color-swatch" style="background-color: #7c3aed;" data-color="#7c3aed" title="Viola"></button>
+                    <button class="color-swatch active" style="background-color: #ef4444;" data-color="#ef4444"
+                      title="Rosso"></button>
+                    <button class="color-swatch" style="background-color: #f59e0b;" data-color="#f59e0b"
+                      title="Arancione"></button>
+                    <button class="color-swatch" style="background-color: #10b981;" data-color="#10b981"
+                      title="Verde"></button>
+                    <button class="color-swatch" style="background-color: #3b82f6;" data-color="#3b82f6"
+                      title="Blu"></button>
+                    <button class="color-swatch" style="background-color: #7c3aed;" data-color="#7c3aed"
+                      title="Viola"></button>
                   </div>
                 </div>
 
@@ -219,10 +293,15 @@
 
                 <div class="toolbar-group flex-end">
                   <button class="btn btn-secondary btn-xs" id="btnCrop" title="Ritaglia Immagine">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path>
+                      <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path>
+                    </svg>
                     Ritaglia
                   </button>
-                  <button class="btn btn-secondary btn-xs" id="btnUndo" disabled title="Annulla ultima modifica (Ctrl+Z)">
+                  <button class="btn btn-secondary btn-xs" id="btnUndo" disabled
+                    title="Annulla ultima modifica (Ctrl+Z)">
                     Annulla
                   </button>
                   <button class="btn btn-secondary btn-xs" id="btnRedo" disabled title="Ripristina modifica (Ctrl+Y)">
@@ -238,14 +317,20 @@
               <div class="canvas-wrapper">
                 <div class="canvas-placeholder" id="canvasPlaceholder">
                   <div class="placeholder-content">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
                     <h4>Nessuna Immagine</h4>
-                    <p>Incolla un'immagine con <strong>Ctrl+V</strong>, selezionala dai file, oppure cattura uno screenshot a destra.</p>
+                    <p>Incolla un'immagine con <strong>Ctrl+V</strong>, selezionala dai file, oppure cattura uno
+                      screenshot a destra.</p>
                     <input type="file" id="stepImageFileInput" accept="image/*" style="display: none;">
                     <button class="btn btn-secondary btn-sm" id="btnBrowseImage">Sfoglia Immagine...</button>
                   </div>
                 </div>
-                
+
                 <!-- CANVAS REALE PER EDITING -->
                 <div class="canvas-container hidden" id="canvasContainer">
                   <canvas id="editorCanvas"></canvas>
@@ -265,30 +350,42 @@
 
         <!-- 3. PANNELLO DESTRO: CATTURA SCHERMO & ESPORTAZIONE -->
         <aside class="workspace-actions no-print">
-          
+
           <!-- SEZIONE CATTURA SCHERMO -->
           <div class="card capture-card">
             <h3>Cattura Schermo</h3>
-            
+
             <!-- CONFIGURAZIONE SCORCIATOIA -->
             <div class="hotkey-config">
               <label for="hotkeyInput">Scorciatoia tastiera:</label>
               <div class="hotkey-input-container">
-                <input type="text" id="hotkeyInput" readonly value="Ctrl + Space" title="Fai clic e premi una combinazione di tasti per cambiarla">
+                <input type="text" id="hotkeyInput" readonly value="Ctrl + Space"
+                  title="Fai clic e premi una combinazione di tasti per cambiarla">
                 <span class="hotkey-hint">Fai clic per registrare</span>
               </div>
             </div>
-            
+
             <!-- STATO CATTURA DISATTIVA -->
             <div class="capture-inactive" id="captureInactive">
-              <p class="card-description">Collega la registrazione per catturare screenshot in tempo reale direttamente in questo programma.</p>
+              <p class="card-description">Collega la registrazione per catturare screenshot in tempo reale direttamente
+                in questo programma.</p>
               <div class="capture-buttons-grid">
                 <button class="btn btn-primary btn-block" id="btnStartCapture">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
                   Condividi Schermo
                 </button>
-                <button class="btn btn-secondary btn-block" id="btnStartPipInactive" title="Apri finestra fluttuante PiP (avvierà anche lo schermo)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><path d="M7 2h10v7H7z"></path></svg>
+                <button class="btn btn-secondary btn-block" id="btnStartPipInactive"
+                  title="Apri finestra fluttuante PiP (avvierà anche lo schermo)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                    <path d="M7 2h10v7H7z"></path>
+                  </svg>
                   Finestra Fluttuante (PiP)
                 </button>
               </div>
@@ -302,20 +399,26 @@
                   <span class="live-dot animate-pulse"></span> IN DIRETTA
                 </div>
               </div>
-              
+
               <div class="capture-buttons-grid">
                 <button class="btn btn-primary btn-block" id="btnSnap">
                   📸 CATTURA PASSO (<span id="hotkeyDisplay">Ctrl + Space</span>)
                 </button>
-                
-                <button class="btn btn-secondary btn-block" id="btnStartPip" title="Finestra fluttuante sopra gli altri programmi">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><path d="M7 2h10v7H7z"></path></svg>
+
+                <button class="btn btn-secondary btn-block" id="btnStartPip"
+                  title="Finestra fluttuante sopra gli altri programmi">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                    <path d="M7 2h10v7H7z"></path>
+                  </svg>
                   Finestra Fluttuante (PiP)
                 </button>
               </div>
 
-              <p class="help-text text-center">Seleziona un passo a sinistra prima di scattare per sostituire l'immagine, oppure scatta per aggiungere automaticamente un nuovo passaggio in coda.</p>
-              
+              <p class="help-text text-center">Seleziona un passo a sinistra prima di scattare per sostituire
+                l'immagine, oppure scatta per aggiungere automaticamente un nuovo passaggio in coda.</p>
+
               <button class="btn btn-danger-outline btn-block btn-sm" id="btnStopCapture">
                 Termina Condivisione
               </button>
@@ -325,25 +428,31 @@
           <!-- SEZIONE INCOLLA RAPIDO -->
           <div class="card clipboard-card">
             <h4>Incolla Rapido (Ctrl+V)</h4>
-            <p class="help-text">Puoi usare lo Strumento di Cattura di Windows (<code>Win + Shift + S</code>), fare uno screenshot, e poi premere <strong>Ctrl+V</strong> in questa pagina per creare subito un nuovo passaggio con l'immagine degli appunti!</p>
+            <p class="help-text">Puoi usare lo Strumento di Cattura di Windows (<code>Win + Shift + S</code>), fare uno
+              screenshot, e poi premere <strong>Ctrl+V</strong> in questa pagina per creare subito un nuovo passaggio
+              con l'immagine degli appunti!</p>
           </div>
 
           <!-- SEZIONE ESPORTAZIONE -->
           <div class="card export-card">
             <h3>Esporta Documento</h3>
             <p class="card-description">Scegli il formato per salvare o condividere la guida di processo finita.</p>
-            
+
             <div class="export-buttons-stack">
-              <button class="btn btn-success btn-block" id="btnExportHtml" title="Genera un singolo file HTML interattivo con immagini incluse">
+              <button class="btn btn-success btn-block" id="btnExportHtml"
+                title="Genera un singolo file HTML interattivo con immagini incluse">
                 📄 Esporta HTML Autonomo
               </button>
-              <button class="btn btn-secondary btn-block" id="btnPrintPdf" title="Salva come PDF o Stampa la guida tramite browser">
+              <button class="btn btn-secondary btn-block" id="btnPrintPdf"
+                title="Salva come PDF o Stampa la guida tramite browser">
                 🖨️ Salva come PDF / Stampa
               </button>
-              <button class="btn btn-secondary btn-block" id="btnExportMarkdown" title="Genera file Markdown con immagini in base64">
+              <button class="btn btn-secondary btn-block" id="btnExportMarkdown"
+                title="Genera file Markdown con immagini in base64">
                 📝 Esporta come Markdown
               </button>
-              <button class="btn btn-secondary-outline btn-block btn-sm" id="btnExportJson" title="Esporta file di backup modificabile per riaprirlo su StepSnap">
+              <button class="btn btn-secondary-outline btn-block btn-sm" id="btnExportJson"
+                title="Esporta file di backup modificabile per riaprirlo su StepSnap">
                 💾 Esporta Progetto (JSON)
               </button>
             </div>
@@ -371,28 +480,40 @@
       <div class="modal-body">
         <h3>Come documentare un processo velocemente:</h3>
         <ol>
-          <li><strong>Crea una guida:</strong> Inserisci il titolo del processo (es. <em>Fatturazione in SAP</em>) e l'obiettivo.</li>
-          <li><strong>Condividi lo schermo:</strong> Fai clic su <strong>"Condividi Schermo/Finestra"</strong>. Consigliamo di selezionare lo schermo intero o la specifica finestra dell'applicazione che vuoi documentare.</li>
-          <li><strong>Usa il Picture-in-Picture fluttuante (Consigliato):</strong> 
+          <li><strong>Crea una guida:</strong> Inserisci il titolo del processo (es. <em>Fatturazione in SAP</em>) e
+            l'obiettivo.</li>
+          <li><strong>Condividi lo schermo:</strong> Fai clic su <strong>"Condividi Schermo/Finestra"</strong>.
+            Consigliamo di selezionare lo schermo intero o la specifica finestra dell'applicazione che vuoi documentare.
+          </li>
+          <li><strong>Usa il Picture-in-Picture fluttuante (Consigliato):</strong>
             <ul>
               <li>Fai clic su <strong>"Finestra Fluttuante (PiP)"</strong>.</li>
-              <li>Si aprirà un piccolo pannellino trasparente che rimarrà sempre in primo piano, sopra tutti gli altri programmi.</li>
-              <li>Lavora normalmente nel tuo programma di destinazione e fai clic su <strong>"Cattura Passo"</strong> sul pannellino fluttuante ogni volta che esegui un'azione chiave. Ogni clic salverà lo screenshot corrente creandone un passo.</li>
+              <li>Si aprirà un piccolo pannellino trasparente che rimarrà sempre in primo piano, sopra tutti gli altri
+                programmi.</li>
+              <li>Lavora normalmente nel tuo programma di destinazione e fai clic su <strong>"Cattura Passo"</strong>
+                sul pannellino fluttuante ogni volta che esegui un'azione chiave. Ogni clic salverà lo screenshot
+                corrente creandone un passo.</li>
             </ul>
           </li>
-          <li><strong>Metodo alternativo (Appunti):</strong> Usa lo strumento integrato di Windows per lo screenshot (<code>Tasto Windows + Shift + S</code>), cattura l'area, torna in StepSnap e premi <strong>Ctrl + V</strong> in qualsiasi punto.</li>
-          <li><strong>Annota & Spiega:</strong> 
+          <li><strong>Metodo alternativo (Appunti):</strong> Usa lo strumento integrato di Windows per lo screenshot
+            (<code>Tasto Windows + Shift + S</code>), cattura l'area, torna in StepSnap e premi <strong>Ctrl +
+              V</strong> in qualsiasi punto.</li>
+          <li><strong>Annota & Spiega:</strong>
             <ul>
               <li>Seleziona ciascun passaggio creato.</li>
               <li>Aggiungi un titolo descrittivo e le istruzioni dettagliate.</li>
-              <li>Usa l'editor grafico per posizionare **Frecce** colorate, **Rettangoli** per evidenziare bottoni, o usa lo strumento **Pixelazione** per censurare dati personali e password.</li>
+              <li>Usa l'editor grafico per posizionare **Frecce** colorate, **Rettangoli** per evidenziare bottoni, o
+                usa lo strumento **Pixelazione** per censurare dati personali e password.</li>
             </ul>
           </li>
-          <li><strong>Esporta:</strong> Una volta finito, esporta in **HTML Autonomo** (un singolo file leggero che puoi inviare via mail a colleghi, completo di immagini e stili) o in **PDF** tramite la funzione Stampa.</li>
+          <li><strong>Esporta:</strong> Una volta finito, esporta in **HTML Autonomo** (un singolo file leggero che puoi
+            inviare via mail a colleghi, completo di immagini e stili) o in **PDF** tramite la funzione Stampa.</li>
         </ol>
-        
+
         <div class="alert alert-info">
-          <strong>Privacy Garantita:</strong> StepSnap funziona interamente in locale nel tuo browser. Le immagini acquisite e i testi scritti rimangono salvati esclusivamente all'interno del database del tuo PC e non vengono mai inviati a server esterni.
+          <strong>Privacy Garantita:</strong> StepSnap funziona interamente in locale nel tuo browser. Le immagini
+          acquisite e i testi scritti rimangono salvati esclusivamente all'interno del database del tuo PC e non vengono
+          mai inviati a server esterni.
         </div>
       </div>
       <div class="modal-footer">
@@ -403,4 +524,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
