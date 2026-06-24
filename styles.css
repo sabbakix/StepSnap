@@ -109,8 +109,12 @@ body {
   cursor: pointer;
 }
 
-.logo-icon {
-  font-size: 28px;
+.logo-icon-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
 }
 
 .logo-text h1 {
