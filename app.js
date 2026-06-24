@@ -181,18 +181,22 @@ function setupEventListeners() {
   // Navigazione
   document.getElementById('btnDashboard').addEventListener('click', async () => {
     if (currentSession) {
-      if (confirm("Vuoi tornare alla dashboard? Il tuo lavoro corrente è salvato automaticamente.")) {
-        closeWorkspace();
-      }
+      const ok = await showConfirm("Il tuo lavoro è salvato automaticamente. Vuoi tornare alla dashboard?", {
+        confirmText: 'Torna alla Dashboard',
+        cancelText: 'Rimani'
+      });
+      if (ok) closeWorkspace();
     } else {
       closeWorkspace();
     }
   });
 
-  document.getElementById('btnBackToDashboard').addEventListener('click', () => {
-    if (confirm("Tornare alla dashboard?")) {
-      closeWorkspace();
-    }
+  document.getElementById('btnBackToDashboard').addEventListener('click', async () => {
+    const ok = await showConfirm("Il tuo lavoro è salvato automaticamente. Vuoi tornare alla dashboard?", {
+      confirmText: 'Torna alla Dashboard',
+      cancelText: 'Rimani'
+    });
+    if (ok) closeWorkspace();
   });
 
   // Gestione Modale Istruzioni
@@ -315,7 +319,7 @@ function setupEventListeners() {
     jsonUploadZone.style.backgroundColor = 'var(--bg-color)';
   });
   
-  jsonUploadZone.addEventListener('drop', (e) => {
+  jsonUploadZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     jsonUploadZone.style.borderColor = 'var(--border-color)';
     jsonUploadZone.style.backgroundColor = 'var(--bg-color)';
@@ -323,7 +327,7 @@ function setupEventListeners() {
     if (file && file.name.endsWith('.json')) {
       importJsonProject(file);
     } else {
-      alert("Carica solo file di progetto .json validi.");
+      await showAlert("Carica solo file di progetto .json validi.");
     }
   });
   
@@ -416,21 +420,45 @@ function setupEventListeners() {
   document.getElementById('btnUndo').addEventListener('click', undo);
   document.getElementById('btnRedo').addEventListener('click', redo);
   
-  // Scorciatoie tastiera standard per Canvas (Ctrl+Z / Ctrl+Y)
+  // Scorciatoie tastiera: Canvas (Ctrl+Z/Y) + navigazione passi (↑↓) + cancella (Canc)
   window.addEventListener('keydown', (e) => {
-    if (selectedStepId && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-      if (e.ctrlKey && e.key === 'z') {
-        e.preventDefault();
-        undo();
-      } else if (e.ctrlKey && e.key === 'y') {
-        e.preventDefault();
-        redo();
+    const isEditing = document.activeElement.tagName === 'INPUT' ||
+                      document.activeElement.tagName === 'TEXTAREA' ||
+                      document.activeElement.isContentEditable;
+    if (isEditing || document.querySelector('.modal-overlay.active')) return;
+
+    if (selectedStepId) {
+      if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); return; }
+      if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; }
+    }
+
+    if (!currentSession || currentSession.steps.length === 0 || e.ctrlKey || e.altKey) return;
+
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const steps = currentSession.steps;
+      const currentIndex = steps.findIndex(s => s.id === selectedStepId);
+      const newIndex = e.key === 'ArrowUp'
+        ? Math.max(0, currentIndex - 1)
+        : Math.min(steps.length - 1, currentIndex + 1);
+      if (newIndex !== currentIndex) {
+        selectStep(steps[newIndex].id);
+        document.querySelector(`.step-item-card[data-id="${steps[newIndex].id}"]`)
+          ?.scrollIntoView({ block: 'nearest' });
       }
+    }
+
+    if (e.key === 'Delete' && selectedStepId) {
+      deleteStep(selectedStepId);
     }
   });
 
-  document.getElementById('btnResetImage').addEventListener('click', () => {
-    if (confirm("Sei sicuro di voler rimuovere tutte le annotazioni fatte su questa immagine? L'immagine originale rimarrà intatta.")) {
+  document.getElementById('btnResetImage').addEventListener('click', async () => {
+    const ok = await showConfirm("Vuoi rimuovere tutte le annotazioni da questa immagine? L'immagine originale rimarrà intatta.", {
+      confirmText: 'Rimuovi Annotazioni',
+      isDanger: true
+    });
+    if (ok) {
       annotations = [];
       pushToHistory();
       drawCanvas();
@@ -535,6 +563,8 @@ function setupEventListeners() {
     hotkeyInput.blur();
     showToast("Scorciatoia aggiornata: " + hotkeyConfig.display);
   });
+
+  setupDragAndDrop(document.getElementById('stepsList'));
 }
 
 // 4. CARICAMENTO DASHBOARD
@@ -589,7 +619,11 @@ window.loadSession = async (id) => {
 };
 
 window.deleteSessionConfirm = async (id) => {
-  if (confirm("Sei sicuro di voler eliminare questa guida permanentemente dal PC? Questa azione non può essere annullata.")) {
+  const ok = await showConfirm("Vuoi eliminare questa guida definitivamente? Questa azione non può essere annullata.", {
+    confirmText: 'Elimina Definitivamente',
+    isDanger: true
+  });
+  if (ok) {
     await dbDeleteSession(id);
     showToast("Guida eliminata con successo!");
     await loadDashboard();
@@ -647,14 +681,23 @@ function renderStepsList() {
     const card = document.createElement('div');
     card.className = `step-item-card ${step.id === selectedStepId ? 'active' : ''}`;
     card.setAttribute('data-id', step.id);
-    
+    card.setAttribute('data-index', index);
+    card.setAttribute('draggable', 'true');
+
     // Anteprima Immagine
     let thumbHtml = '<div class="step-item-thumb-placeholder">📄</div>';
     if (step.image) {
       thumbHtml = `<img src="${step.image}" alt="Anteprima">`;
     }
-    
+
     card.innerHTML = `
+      <div class="step-drag-handle" title="Trascina per riordinare">
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor">
+          <circle cx="2" cy="2" r="1.5"/><circle cx="8" cy="2" r="1.5"/>
+          <circle cx="2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/>
+          <circle cx="2" cy="14" r="1.5"/><circle cx="8" cy="14" r="1.5"/>
+        </svg>
+      </div>
       <div class="step-item-thumb" onclick="selectStep('${step.id}')">
         ${thumbHtml}
       </div>
@@ -663,12 +706,6 @@ function renderStepsList() {
         <span class="step-item-title">${escapeHtml(step.title || "Passaggio vuoto")}</span>
       </div>
       <div class="step-item-actions">
-        <button class="btn-step-control" onclick="moveStep(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Sposta su">
-          ▲
-        </button>
-        <button class="btn-step-control" onclick="moveStep(${index}, 1)" ${index === currentSession.steps.length - 1 ? 'disabled' : ''} title="Sposta giù">
-          ▼
-        </button>
         <button class="btn-step-control delete" onclick="deleteStep('${step.id}', event)" title="Elimina passaggio">
           🗑️
         </button>
@@ -695,13 +732,17 @@ window.moveStep = (index, direction) => {
 };
 
 // Cancellazione passaggio
-window.deleteStep = (id, event) => {
+window.deleteStep = async (id, event) => {
   if (event) event.stopPropagation();
-  if (confirm("Vuoi eliminare questo passaggio?")) {
+  const ok = await showConfirm("Vuoi eliminare questo passaggio?", {
+    confirmText: 'Elimina Passaggio',
+    isDanger: true
+  });
+  if (ok) {
     const index = currentSession.steps.findIndex(s => s.id === id);
     if (index !== -1) {
       currentSession.steps.splice(index, 1);
-      
+
       if (selectedStepId === id) {
         selectedStepId = null;
         if (currentSession.steps.length > 0) {
@@ -714,7 +755,7 @@ window.deleteStep = (id, event) => {
       } else {
         renderStepsList();
       }
-      
+
       saveCurrentSession();
       showToast("Passaggio eliminato.");
     }
@@ -976,20 +1017,20 @@ function getCanvasMouseCoords(e) {
   };
 }
 
-function startDrawing(e) {
+async function startDrawing(e) {
   if (currentTool === 'select' && !isCropping) return;
-  
+
   const coords = getCanvasMouseCoords(e);
   startX = coords.x;
   startY = coords.y;
   currentX = coords.x;
   currentY = coords.y;
-  
+
   isDrawing = true;
-  
+
   if (currentTool === 'text') {
     isDrawing = false;
-    const txt = prompt("Inserisci il testo da posizionare:");
+    const txt = await showPrompt();
     if (txt && txt.trim()) {
       annotations.push({
         type: 'text',
@@ -1116,9 +1157,9 @@ function saveFlattenedImage() {
 }
 
 // 12. RITAGLIO (CROP) INTERATTIVO
-function toggleCropMode() {
+async function toggleCropMode() {
   const btn = document.getElementById('btnCrop');
-  
+
   if (!isCropping) {
     // Attiva Crop
     isCropping = true;
@@ -1137,7 +1178,7 @@ function toggleCropMode() {
   } else {
     // Applica Ritaglio se l'area è definita
     if (cropX1 !== cropX2 && cropY1 !== cropY2) {
-      applyCrop(cropX1, cropY1, cropX2, cropY2);
+      await applyCrop(cropX1, cropY1, cropX2, cropY2);
     } else {
       disableCropMode();
       showToast("Ritaglio annullato (nessuna area selezionata).");
@@ -1185,14 +1226,14 @@ function drawCropOverlay(targetCtx, x1, y1, x2, y2) {
   targetCtx.setLineDash([]); // Ripristina linea continua
 }
 
-function applyCrop(x1, y1, x2, y2) {
+async function applyCrop(x1, y1, x2, y2) {
   const x = Math.min(x1, x2);
   const y = Math.min(y1, y2);
   const w = Math.abs(x2 - x1);
   const h = Math.abs(y2 - y1);
-  
+
   if (w < 10 || h < 10) {
-    alert("Area selezionata troppo piccola per il ritaglio.");
+    await showAlert("Area selezionata troppo piccola per il ritaglio.");
     disableCropMode();
     return;
   }
@@ -1266,7 +1307,7 @@ async function startScreenCapture(autoStartPip = false) {
     }
   } catch (err) {
     console.error("Errore condivisione schermo:", err);
-    alert("Impossibile accedere allo schermo. Permesso negato o non supportato.");
+    await showAlert("Impossibile accedere allo schermo. Permesso negato o non supportato.");
   }
 }
 
@@ -1290,7 +1331,7 @@ function stopScreenCapture() {
   showToast("Condivisione schermo disattivata.");
 }
 
-function captureScreenshot(fromPip = false) {
+async function captureScreenshot(fromPip = false) {
   if (!mediaStream) return;
   
   const video = document.getElementById('streamVideo');
@@ -1331,7 +1372,7 @@ function captureScreenshot(fromPip = false) {
     if (selectedStepId) {
       const step = currentSession.steps.find(s => s.id === selectedStepId);
       if (step) {
-        if (!step.rawImage || confirm("Vuoi sostituire l'immagine attuale di questo passaggio con il nuovo screenshot?")) {
+        if (!step.rawImage || await showConfirm("Vuoi sostituire l'immagine di questo passaggio con il nuovo screenshot?", { confirmText: 'Sostituisci' })) {
           step.rawImage = dataUrl;
           step.image = dataUrl;
           step.annotations = [];
@@ -1365,17 +1406,17 @@ function checkPipSupport() {
 
 async function startPip() {
   if (!('documentPictureInPicture' in window)) {
-    alert("La finestra fluttuante PiP non è supportata da questo browser. Si consiglia l'uso di Google Chrome o Microsoft Edge su Windows.");
+    await showAlert("La finestra fluttuante PiP non è supportata da questo browser. Si consiglia l'uso di Google Chrome o Microsoft Edge su Windows.");
     return;
   }
-  
+
   if (pipWindow) {
     pipWindow.close();
     return;
   }
-  
+
   if (!mediaStream) {
-    alert("Avvia prima la condivisione dello schermo/finestra a sinistra.");
+    await showAlert("Avvia prima la condivisione dello schermo/finestra a sinistra.");
     return;
   }
 
@@ -1434,7 +1475,7 @@ async function startPip() {
     showToast("Finestra fluttuante aperta! Spostala sopra l'app che vuoi documentare.");
   } catch (err) {
     console.error("Errore apertura Picture-in-Picture:", err);
-    alert("Impossibile aprire la finestra fluttuante.");
+    await showAlert("Impossibile aprire la finestra fluttuante.");
   }
 }
 
@@ -1516,21 +1557,21 @@ function importJsonProject(file) {
         openWorkspace();
         showToast("Progetto importato con successo!");
       } else {
-        alert("Struttura del file JSON non valida. Assicurati che sia un progetto esportato da StepSnap.");
+        await showAlert("Struttura del file JSON non valida. Assicurati che sia un progetto esportato da StepSnap.");
       }
     } catch (err) {
       console.error("Errore importazione JSON:", err);
-      alert("Impossibile leggere il file JSON. Assicurati che non sia corrotto.");
+      await showAlert("Impossibile leggere il file JSON. Assicurati che non sia corrotto.");
     }
   };
   reader.readAsText(file);
 }
 
 // Esporta un singolo HTML autonomo con immagini base64
-function exportHtmlFile() {
+async function exportHtmlFile() {
   if (!currentSession) return;
   if (currentSession.steps.length === 0) {
-    alert("Aggiungi almeno un passaggio con un'immagine per esportare la guida.");
+    await showAlert("Aggiungi almeno un passaggio con un'immagine per esportare la guida.");
     return;
   }
   
@@ -1892,6 +1933,60 @@ function updateHotkeyDisplays() {
   }
 }
 
+// ========================================
+// DRAG-AND-DROP RIORDINAMENTO PASSI
+// ========================================
+
+function setupDragAndDrop(stepsList) {
+  let dragSrcIndex = -1;
+
+  stepsList.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.step-item-card');
+    if (!card) return;
+    dragSrcIndex = parseInt(card.dataset.index);
+    e.dataTransfer.effectAllowed = 'move';
+    // Defer the class so the drag ghost captures the normal card appearance
+    setTimeout(() => card.classList.add('dragging'), 0);
+  });
+
+  stepsList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const card = e.target.closest('.step-item-card');
+    if (!card || parseInt(card.dataset.index) === dragSrcIndex) return;
+    stepsList.querySelectorAll('.step-item-card.drag-over')
+      .forEach(c => c.classList.remove('drag-over'));
+    card.classList.add('drag-over');
+  });
+
+  stepsList.addEventListener('dragleave', (e) => {
+    const card = e.target.closest('.step-item-card');
+    if (card && !card.contains(e.relatedTarget)) card.classList.remove('drag-over');
+  });
+
+  stepsList.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const card = e.target.closest('.step-item-card');
+    if (!card) return;
+    const dropIndex = parseInt(card.dataset.index);
+    if (dragSrcIndex === -1 || dragSrcIndex === dropIndex) return;
+
+    const steps = currentSession.steps;
+    const [moved] = steps.splice(dragSrcIndex, 1);
+    steps.splice(dropIndex, 0, moved);
+
+    renderStepsList();
+    saveCurrentSession();
+    dragSrcIndex = -1;
+  });
+
+  stepsList.addEventListener('dragend', () => {
+    stepsList.querySelectorAll('.step-item-card.dragging, .step-item-card.drag-over')
+      .forEach(c => c.classList.remove('dragging', 'drag-over'));
+    dragSrcIndex = -1;
+  });
+}
+
 function normalizeCode(code) {
   if (!code) return '';
   if (code.startsWith('Key')) return code.substring(3);
@@ -1903,6 +1998,111 @@ function normalizeCode(code) {
   if (code === 'ArrowLeft') return '←';
   if (code === 'ArrowRight') return '→';
   return code;
+}
+
+// ========================================
+// DIALOGS PERSONALIZZATI
+// ========================================
+
+function showConfirm(message, { confirmText = 'Conferma', cancelText = 'Annulla', isDanger = false } = {}) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirmModal');
+    const okBtn = document.getElementById('confirmModalOk');
+    const cancelBtn = document.getElementById('confirmModalCancel');
+
+    document.getElementById('confirmModalMessage').textContent = message;
+    okBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    okBtn.className = `btn ${isDanger ? 'btn-danger' : 'btn-primary'}`;
+
+    modal.classList.add('active');
+    setTimeout(() => okBtn.focus(), 50);
+
+    const cleanup = (result) => {
+      modal.classList.remove('active');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      document.removeEventListener('keydown', onKeydown);
+      modal.removeEventListener('click', onOverlay);
+      resolve(result);
+    };
+
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onKeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); cleanup(true); }
+      if (e.key === 'Escape') { e.preventDefault(); cleanup(false); }
+    };
+    const onOverlay = (e) => { if (e.target === modal) cleanup(false); };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    document.addEventListener('keydown', onKeydown);
+    modal.addEventListener('click', onOverlay);
+  });
+}
+
+function showAlert(message) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('alertModal');
+    const okBtn = document.getElementById('alertModalOk');
+
+    document.getElementById('alertModalMessage').textContent = message;
+    modal.classList.add('active');
+    setTimeout(() => okBtn.focus(), 50);
+
+    const cleanup = () => {
+      modal.classList.remove('active');
+      okBtn.removeEventListener('click', cleanup);
+      document.removeEventListener('keydown', onKeydown);
+      modal.removeEventListener('click', onOverlay);
+      resolve();
+    };
+
+    const onKeydown = (e) => {
+      if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); cleanup(); }
+    };
+    const onOverlay = (e) => { if (e.target === modal) cleanup(); };
+
+    okBtn.addEventListener('click', cleanup);
+    document.addEventListener('keydown', onKeydown);
+    modal.addEventListener('click', onOverlay);
+  });
+}
+
+function showPrompt() {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('promptModal');
+    const input = document.getElementById('promptModalInput');
+    const okBtn = document.getElementById('promptModalOk');
+    const cancelBtn = document.getElementById('promptModalCancel');
+
+    input.value = '';
+    modal.classList.add('active');
+    setTimeout(() => input.focus(), 50);
+
+    const cleanup = (value) => {
+      modal.classList.remove('active');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      document.removeEventListener('keydown', onKeydown);
+      modal.removeEventListener('click', onOverlay);
+      resolve(value);
+    };
+
+    const onOk = () => cleanup(input.value);
+    const onCancel = () => cleanup(null);
+    const onKeydown = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); cleanup(input.value); }
+      if (e.key === 'Escape') { e.preventDefault(); cleanup(null); }
+    };
+    const onOverlay = (e) => { if (e.target === modal) cleanup(null); };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    document.addEventListener('keydown', onKeydown);
+    modal.addEventListener('click', onOverlay);
+  });
 }
 
 // ========================================

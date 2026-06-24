@@ -175,10 +175,6 @@
             <span class="badge" id="stepCountBadge">0</span>
           </div>
 
-          <div class="steps-list" id="stepsList">
-            <!-- Popolato dinamicamente da app.js -->
-          </div>
-
           <button class="btn btn-secondary btn-block btn-add-step" id="btnAddEmptyStep">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -187,6 +183,10 @@
             </svg>
             Aggiungi Passo Vuoto
           </button>
+
+          <div class="steps-list" id="stepsList">
+            <!-- Popolato dinamicamente da app.js -->
+          </div>
         </aside>
 
         <!-- 2. AREA CENTRALE: EDITOR PASSAGGIO CORRENTE -->
@@ -518,6 +518,50 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" id="btnConfirmCloseHelp">Ho capito, iniziamo!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE CONFERMA GENERICA -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-content modal-sm">
+      <div class="modal-body">
+        <p id="confirmModalMessage" class="dialog-message"></p>
+      </div>
+      <div class="modal-footer modal-footer-split">
+        <button class="btn btn-secondary" id="confirmModalCancel">Annulla</button>
+        <button class="btn btn-primary" id="confirmModalOk">Conferma</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE AVVISO GENERICO -->
+  <div class="modal-overlay" id="alertModal">
+    <div class="modal-content modal-sm">
+      <div class="modal-body">
+        <p id="alertModalMessage" class="dialog-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="alertModalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE INSERIMENTO TESTO (STRUMENTO CANVAS) -->
+  <div class="modal-overlay" id="promptModal">
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h2>Inserisci Testo</h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label for="promptModalInput">Testo da aggiungere all'immagine:</label>
+          <input type="text" id="promptModalInput" placeholder="Es. Clicca qui...">
+        </div>
+      </div>
+      <div class="modal-footer modal-footer-split">
+        <button class="btn btn-secondary" id="promptModalCancel">Annulla</button>
+        <button class="btn btn-primary" id="promptModalOk">Inserisci</button>
       </div>
     </div>
   </div>
