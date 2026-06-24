@@ -34,6 +34,9 @@ let currentY = 0;
 let isCropping = false;
 let cropX1 = 0, cropY1 = 0, cropX2 = 0, cropY2 = 0;
 
+// PWA Install Prompt
+let deferredInstallPrompt = null;
+
 // Stato della scorciatoia da tastiera personalizzata (Ctrl + Space di default)
 let hotkeyConfig = {
   ctrl: true,
@@ -51,6 +54,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   await loadDashboard();
   checkPipSupport();
+  registerServiceWorker();
+  setupPWAInstall();
 });
 
 // 1. INIZIALIZZAZIONE INDEXED DB
@@ -1898,4 +1903,74 @@ function normalizeCode(code) {
   if (code === 'ArrowLeft') return '←';
   if (code === 'ArrowRight') return '→';
   return code;
+}
+
+// ========================================
+// PROGRESSIVE WEB APP (PWA) SUPPORT
+// ========================================
+
+// Registra il Service Worker per abilitare l'offline e l'installazione
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then((registration) => {
+        console.log('Service Worker registrato con successo:', registration.scope);
+      })
+      .catch((error) => {
+        console.warn('Registrazione Service Worker fallita:', error);
+      });
+  }
+}
+
+// Gestisce il prompt di installazione PWA
+function setupPWAInstall() {
+  const btnInstall = document.getElementById('btnInstallApp');
+  if (!btnInstall) return;
+
+  // Intercetta l'evento beforeinstallprompt del browser
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Impedisce la visualizzazione del mini-infobar automatico del browser
+    e.preventDefault();
+    // Salva l'evento per usarlo quando l'utente clicca il bottone
+    deferredInstallPrompt = e;
+    // Mostra il bottone "Installa App"
+    btnInstall.classList.remove('hidden');
+    btnInstall.classList.add('pwa-install-animate');
+  });
+
+  // Gestisce il clic sul bottone "Installa App"
+  btnInstall.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+
+    // Mostra il prompt di installazione nativo del browser
+    deferredInstallPrompt.prompt();
+
+    // Attende la risposta dell'utente
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    console.log('Scelta installazione PWA:', outcome);
+
+    // Resetta il prompt (può essere usato solo una volta)
+    deferredInstallPrompt = null;
+    btnInstall.classList.add('hidden');
+    btnInstall.classList.remove('pwa-install-animate');
+  });
+
+  // Rileva quando l'app è stata installata con successo
+  window.addEventListener('appinstalled', () => {
+    console.log('StepSnap installata come PWA!');
+    deferredInstallPrompt = null;
+    btnInstall.classList.add('hidden');
+    btnInstall.classList.remove('pwa-install-animate');
+
+    // Mostra una notifica di conferma
+    const toast = document.getElementById('saveToast');
+    if (toast) {
+      toast.textContent = '✅ StepSnap installata come app!';
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.textContent = 'Modifiche salvate!';
+      }, 3000);
+    }
+  });
 }
