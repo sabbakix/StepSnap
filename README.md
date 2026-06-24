@@ -1,6 +1,10 @@
 # StepSnap - Documentazione Processi Semplificata
 
+https://sabbakix.github.io/StepSnap
+
+
 **StepSnap** è una web application standalone progettata per creare guide passo-passo in modo rapido e interattivo. Pensata appositamente per ambienti aziendali Windows, non richiede installazione, ha zero dipendenze e funziona interamente offline per salvaguardare la privacy dei dati.
+[Installazione come PWA] StepSnap può essere installata come vera e propria applicazione desktop sul tuo PC Windows. Clicca sul pulsante "Installa App" che appare in alto a destra e segui le istruzioni. Avrai un'icona dedicata sul desktop e non dovrai più aprire il browser per usarla.
 
 ## Funzionalità Chiave
 
