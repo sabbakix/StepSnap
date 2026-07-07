@@ -130,7 +130,17 @@
 
       <!-- ELENCO GUIDE SALVATE IN LOCAL STORAGE / INDEXED DB -->
       <div class="saved-guides-section">
-        <h3>Le tue Guide in archivio locale</h3>
+        <div class="saved-guides-header">
+          <h3>Le tue Guide in archivio locale</h3>
+          <div class="guides-search-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="guidesSearchInput" placeholder="Cerca per titolo o descrizione…" autocomplete="off">
+          </div>
+        </div>
         <div class="guides-list-grid" id="guidesListGrid">
           <!-- Popolato dinamicamente da app.js -->
           <div class="empty-state">
@@ -160,6 +170,18 @@
           </div>
         </div>
         <div class="guide-status">
+          <button class="btn btn-secondary btn-sm" id="btnToggleScrollView" title="Vista Scorrimento: scorri tutti i passaggi uno dopo l'altro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            Vista Scorrimento
+          </button>
           <span class="status-badge" id="autoSaveIndicator">
             <span class="status-dot"></span> Salvato in locale
           </span>
@@ -346,6 +368,10 @@
               </div>
             </div>
           </div>
+
+          <!-- VISTA SCORRIMENTO (iniettata dinamicamente) -->
+          <div class="scroll-view-container hidden" id="scrollViewContainer"></div>
+
         </section>
 
         <!-- 3. PANNELLO DESTRO: CATTURA SCHERMO & ESPORTAZIONE -->
@@ -563,6 +589,26 @@
         <button class="btn btn-secondary" id="promptModalCancel">Annulla</button>
         <button class="btn btn-primary" id="promptModalOk">Inserisci</button>
       </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY MODIFICA IMMAGINE IN VISTA SCORRIMENTO -->
+  <div class="sv-edit-overlay hidden" id="svEditOverlay">
+    <div class="sv-edit-panel">
+      <div class="sv-edit-header">
+        <div class="sv-edit-header-info">
+          <span class="sv-edit-step-num" id="svEditStepNum">Passo 1</span>
+          <span class="sv-edit-step-title" id="svEditStepTitle"></span>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btnSvSave">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Salva &amp; Torna
+        </button>
+      </div>
+      <div class="sv-editor-slot" id="svEditorSlot"></div>
     </div>
   </div>
 
