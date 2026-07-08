@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <title>StepSnap Fluttuante</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* Finestra frameless: tutto il corpo è trascinabile */
+      -webkit-app-region: drag;
+      user-select: none;
+    }
+
+    .pip-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .pip-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #a78bfa;
+    }
+
+    .pip-status {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .pip-snap-btn {
+      -webkit-app-region: no-drag;
+      width: 100%;
+      padding: 12px 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #7c3aed;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .pip-snap-btn:hover { background-color: #6d28d9; }
+    .pip-snap-btn:active { transform: scale(0.97); }
+
+    .pip-counter {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .pip-close-btn {
+      -webkit-app-region: no-drag;
+      padding: 5px 14px;
+      font-size: 11px;
+      color: #e2e8f0;
+      background-color: transparent;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .pip-close-btn:hover { background-color: #1e293b; }
+  </style>
+</head>
+
+<body>
+  <div class="pip-container">
+    <div class="pip-title">StepSnap Fluttuante</div>
+    <div class="pip-status">Sempre in primo piano</div>
+    <button class="pip-snap-btn" id="pipSnapBtn">📸 CATTURA PASSO</button>
+    <div class="pip-counter" id="pipCounter">Passi acquisiti: 0</div>
+    <button class="pip-close-btn" id="pipCloseBtn">Ripristina</button>
+  </div>
+  <script type="module" src="/src/pip-main.js"></script>
+</body>
+
+</html>

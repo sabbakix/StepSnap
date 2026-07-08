@@ -1,0 +1,112 @@
+/* ==========================================
+   STILI DI STAMPA PDF (@media print)
+   ========================================== */
+@media print {
+  /* Nascondi elementi dell'interfaccia */
+  .no-print, 
+  header, 
+  aside, 
+  .editor-toolbar, 
+  .editor-text-fields label,
+  .btn,
+  .save-toast,
+  .modal-overlay,
+  #canvasPlaceholder,
+  .guide-status {
+    display: none !important;
+  }
+
+  /* Reset layout di base */
+  body, html {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    min-height: auto !important;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .app-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  .workspace-section {
+    display: none !important; /* Usiamo solo la sezione .print-layout per la stampa */
+  }
+
+  /* Sezione di stampa */
+  .print-layout {
+    display: block !important;
+  }
+
+  .print-header {
+    border-bottom: 2px solid #000000;
+    padding-bottom: 12px;
+    margin-bottom: 30px;
+  }
+
+  .print-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #000000;
+  }
+
+  .print-header p {
+    font-size: 14px;
+    color: #555555;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .print-step-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border-bottom: 1px solid #dddddd;
+    padding: 20px 0;
+    margin-bottom: 20px;
+  }
+
+  .print-step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .print-step-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #7c3aed; /* Mantiene un po' di accento a colori se si stampa a colori */
+  }
+
+  .print-step-title {
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+    margin-left: 10px;
+  }
+
+  .print-step-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #333333;
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+  }
+
+  .print-step-img-container {
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .print-step-img-container img {
+    max-width: 100%;
+    max-height: 420px; /* Evita che l'immagine occupi tutta la pagina */
+    border: 1px solid #cccccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    object-fit: contain;
+  }
+}

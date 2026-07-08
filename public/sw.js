@@ -1,12 +1,11 @@
 // StepSnap Service Worker - PWA Offline Support
-const CACHE_NAME = 'stepsnap-v1';
+const CACHE_NAME = 'stepsnap-v2';
 
-// Risorse essenziali da mettere in cache immediatamente
+// Risorse essenziali da mettere in cache immediatamente.
+// Gli asset con hash generati da Vite vengono cacheati a runtime dal fetch handler.
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './app.js',
-  './styles.css',
   './icon-512.png',
   './manifest.json'
 ];

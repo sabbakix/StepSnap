@@ -1,0 +1,89 @@
+/* DEFINIZIONE VARIABILI DI DESIGN SYSTEM */
+:root {
+  /* TEMA CHIARO (DEFAULT) */
+  --bg-color: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --header-bg: #ffffff;
+  --card-bg: #ffffff;
+  --border-color: #cbd5e1;
+  --border-hover: #94a3b8;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  --primary-color: #7c3aed; /* Viola */
+  --primary-hover: #6d28d9;
+  --primary-light: #f5f3ff;
+  
+  --success-color: #10b981; /* Smeraldo */
+  --success-hover: #059669;
+  
+  --danger-color: #ef4444; /* Rosso */
+  --danger-hover: #dc2626;
+  --danger-light: #fef2f2;
+  
+  --warning-color: #f59e0b; /* Ambra */
+  --warning-light: #fef3c7;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* SINTASSI TEMA SCURO (TOGGLE) */
+[data-theme="dark"] {
+  --bg-color: #0f172a;
+  --bg-secondary: #020617;
+  --header-bg: #1e293b;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --border-hover: #475569;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  --primary-color: #a78bfa; /* Viola chiaro in Dark Mode */
+  --primary-hover: #c084fc;
+  --primary-light: #1e1b4b;
+  
+  --success-color: #34d399;
+  --success-hover: #059669;
+  
+  --danger-color: #f87171;
+  --danger-hover: #ef4444;
+  --danger-light: #450a0a;
+  
+  --warning-color: #fbbf24;
+  --warning-light: #78350f;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* RESET E STILI DI BASE */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+

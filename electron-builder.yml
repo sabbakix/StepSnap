@@ -1,0 +1,31 @@
+appId: com.sabbakix.stepsnap
+productName: StepSnap
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**
+  - electron/**
+
+# electron-builder converte automaticamente build/icon.png (512px)
+# in .ico per Windows e .icns per macOS.
+win:
+  target: nsis
+  icon: build/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: build/icon.png
+  category: Utility
+  synopsis: Documentazione processi con screenshot annotati
+
+mac:
+  target: dmg
+  icon: build/icon.png
+  category: public.app-category.productivity
