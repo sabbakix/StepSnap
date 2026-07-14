@@ -1,11 +1,9 @@
 import { state } from '../state.js';
 import { platform } from '../platform/index.js';
-import { saveCurrentSession } from '../storage/db.js';
 import { showToast } from '../ui/toast.js';
 import { showAlert, showConfirm } from '../ui/modals.js';
 import { getHotkeyConfig } from '../ui/hotkeys.js';
-import { createNewStep, renderStepsList, selectStep } from '../guides/steps.js';
-import { loadStepImage } from '../editor/canvas.js';
+import { createNewStep, appendStep, setStepImage } from '../guides/steps.js';
 
 // Stato Screen Sharing (locale a questo modulo)
 let mediaStream = null;
@@ -48,6 +46,7 @@ export async function startScreenCapture(autoStartPip = false) {
 }
 
 export function stopScreenCapture() {
+  const wasActive = Boolean(mediaStream);
   if (mediaStream) {
     mediaStream.getTracks().forEach(track => track.stop());
     mediaStream = null;
@@ -61,7 +60,8 @@ export function stopScreenCapture() {
 
   platform.closeFloatingWindow();
 
-  showToast("Condivisione schermo disattivata.");
+  // Notifica solo se c'era davvero una condivisione in corso
+  if (wasActive) showToast("Condivisione schermo disattivata.");
 }
 
 // Ottiene un fotogramma: dallo stream se attivo, altrimenti screenshot nativo (solo desktop)
@@ -96,44 +96,36 @@ export async function captureScreenshot(fromPip = false) {
 
   if (fromPip) {
     // In PiP mode, aggiunge SEMPRE come nuovo passaggio alla fine per flusso continuo
-    const newStep = createNewStep(dataUrl);
-    state.currentSession.steps.push(newStep);
-    renderStepsList();
-    selectStep(newStep.id);
-    saveCurrentSession();
-
-    // Auto-scroll sidebar al fondo
-    const stepsList = document.getElementById('stepsList');
-    stepsList.scrollTop = stepsList.scrollHeight;
+    appendStep(createNewStep(dataUrl));
 
     // Aggiorna contatore nella finestra fluttuante
     platform.updateFloatingCounter(state.currentSession.steps.length);
 
     showToast("Nuovo passo acquisito via PiP fluttuante!");
   } else {
-    // In app principale: se c'è un passo selezionato VUOTO, inserisci lì. Altrimenti crea nuovo.
+    // In app principale: se il passo selezionato è VUOTO, inserisci lì.
     if (state.selectedStepId) {
       const step = state.currentSession.steps.find(s => s.id === state.selectedStepId);
-      if (step) {
-        if (!step.rawImage || await showConfirm("Vuoi sostituire l'immagine di questo passaggio con il nuovo screenshot?", { confirmText: 'Sostituisci' })) {
-          step.rawImage = dataUrl;
-          step.image = dataUrl;
-          step.annotations = [];
-          loadStepImage(step);
-          renderStepsList();
-          saveCurrentSession();
+      if (step && !step.rawImage) {
+        setStepImage(step, dataUrl);
+        showToast("Schermata salvata nel passaggio selezionato!");
+        return;
+      }
+
+      // In Vista Modifica è possibile sostituire (con conferma) l'immagine del passo selezionato.
+      // In Vista Scorrimento invece si appende sempre: il passo evidenziato dallo scroll
+      // non è una scelta esplicita e il flusso di cattura non va interrotto da conferme.
+      if (step && !state.scrollViewMode) {
+        if (await showConfirm("Vuoi sostituire l'immagine di questo passaggio con il nuovo screenshot?", { confirmText: 'Sostituisci' })) {
+          setStepImage(step, dataUrl);
           showToast("Schermata salvata nel passaggio selezionato!");
         }
         return;
       }
     }
 
-    // Altrimenti crea nuovo
-    const newStep = createNewStep(dataUrl);
-    state.currentSession.steps.push(newStep);
-    renderStepsList();
-    selectStep(newStep.id);
-    saveCurrentSession();
+    // Altrimenti crea un nuovo passaggio in coda
+    appendStep(createNewStep(dataUrl));
     showToast("Catturato screenshot per un nuovo passaggio!");
   }
 }

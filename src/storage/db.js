@@ -103,10 +103,24 @@ export function saveCurrentSession() {
   // Debounce salvataggio su database locale per prestazioni ottimali
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(async () => {
+    saveTimeout = null;
+    if (!state.currentSession) return; // la guida è stata chiusa nel frattempo
+
     await dbSaveSession(state.currentSession);
 
     // Ripristina badge salvato
     const activeIndicator = document.getElementById('autoSaveIndicator');
     activeIndicator.innerHTML = `<span class="status-dot"></span> Salvato in locale`;
   }, 500);
+}
+
+// Scrive subito eventuali modifiche in attesa di debounce (da chiamare prima di chiudere la guida)
+export async function flushPendingSave() {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+    saveTimeout = null;
+  }
+  if (state.currentSession) {
+    await dbSaveSession(state.currentSession);
+  }
 }

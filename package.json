@@ -16,7 +16,8 @@
     "dist:mac": "npm run build && electron-builder --mac"
   },
   "dependencies": {
-    "@fontsource/outfit": "^5.1.0"
+    "@fontsource/outfit": "^5.1.0",
+    "uiohook-napi": "^1.5.5"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

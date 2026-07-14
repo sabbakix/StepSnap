@@ -87,3 +87,33 @@ body {
   overflow-x: hidden;
 }
 
+/* FOCUS VISIBILE PER LA NAVIGAZIONE DA TASTIERA */
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* I campi di testo e i contenuti editabili hanno già un focus dedicato (bordo + ombra) */
+input[type="text"]:focus-visible,
+textarea:focus-visible,
+.custom-select:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+}
+
+/* Lo switch del tema nasconde l'input nativo: evidenzia lo slider al suo posto */
+.switch input:focus-visible + .slider {
+  box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--primary-color);
+}
+
+/* Riduzione del movimento per chi la richiede a livello di sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

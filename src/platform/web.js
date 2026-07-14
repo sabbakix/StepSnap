@@ -16,6 +16,12 @@ export const webPlatform = {
   // Hotkey globale di sistema non disponibile nel browser
   registerGlobalHotkey: null,
 
+  // Il browser non può rilevare i clic fatti nelle altre applicazioni:
+  // la registrazione automatica esiste solo nell'app desktop (Electron).
+  supportsClickRecording() {
+    return false;
+  },
+
   getDisplayStream(constraints) {
     return navigator.mediaDevices.getDisplayMedia(constraints);
   },
@@ -63,7 +69,12 @@ export const webPlatform = {
           <div class="pip-title">StepSnap Fluttuante</div>
           <div class="pip-status">Condivisione in corso...</div>
           <button class="pip-snap-btn" id="pipSnapBtn">
-            📸 CATTURA PASSO
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            CATTURA PASSO
           </button>
           <div class="pip-counter" id="pipCounter">Passi acquisiti: ${stepCount}</div>
           <button class="pip-close-btn" id="pipCloseBtn">Ripristina</button>
@@ -171,7 +182,7 @@ function setupPWAInstall() {
     // Mostra una notifica di conferma
     const toast = document.getElementById('saveToast');
     if (toast) {
-      toast.textContent = '✅ StepSnap installata come app!';
+      toast.textContent = 'StepSnap installata come app!';
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');

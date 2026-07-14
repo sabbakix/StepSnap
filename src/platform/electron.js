@@ -35,6 +35,26 @@ export const electronPlatform = {
     return window.electronAPI.registerGlobalHotkey(accelerator);
   },
 
+  // --- Registrazione automatica dei clic (hook globale nel main process) ---
+  supportsClickRecording() {
+    return true;
+  },
+
+  async startClickRecording(onStep) {
+    const ok = await window.electronAPI.startAutoRecord();
+    if (ok && !this._autoRecordListenerAttached) {
+      // Il listener IPC resta registrato una sola volta; il main invia eventi
+      // solo mentre la registrazione è attiva.
+      window.electronAPI.onAutoRecordStep(onStep);
+      this._autoRecordListenerAttached = true;
+    }
+    return ok;
+  },
+
+  stopClickRecording() {
+    return window.electronAPI.stopAutoRecord();
+  },
+
   supportsFloatingWindow() {
     return true;
   },

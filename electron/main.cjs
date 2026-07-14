@@ -174,6 +174,128 @@ ipcMain.on('pip:capture-step', () => {
 });
 
 // ---------------------------------------------------------------------------
+// REGISTRAZIONE AUTOMATICA: hook globale mouse/tastiera (uiohook-napi).
+// A ogni clic sinistro (o Invio) cattura lo schermo dove è avvenuto l'evento
+// e invia al renderer screenshot + coordinate normalizzate del punto cliccato.
+// ---------------------------------------------------------------------------
+
+let uiohookLib = null; // caricato pigramente: è una dipendenza nativa opzionale
+let uiohookListenersAttached = false;
+let autoRecordActive = false;
+let autoRecordBusy = false;
+let lastAutoCaptureAt = 0;
+const AUTO_CAPTURE_COOLDOWN_MS = 600;
+
+function loadUiohook() {
+  if (uiohookLib) return true;
+  try {
+    uiohookLib = require('uiohook-napi');
+    return true;
+  } catch (err) {
+    console.warn('uiohook-napi non disponibile:', err.message);
+    return false;
+  }
+}
+
+// uiohook riporta pixel fisici del desktop virtuale; Electron ragiona in DIP
+function toDipPoint(x, y) {
+  return screen.screenToDipPoint ? screen.screenToDipPoint({ x, y }) : { x, y };
+}
+
+function pointInsideOwnWindows(dipPoint) {
+  return [mainWin, pipWin].some((win) => {
+    if (!win || win.isDestroyed()) return false;
+    const b = win.getBounds();
+    return dipPoint.x >= b.x && dipPoint.x <= b.x + b.width &&
+           dipPoint.y >= b.y && dipPoint.y <= b.y + b.height;
+  });
+}
+
+function ownWindowFocused() {
+  return [mainWin, pipWin].some((win) => win && !win.isDestroyed() && win.isFocused());
+}
+
+// Cattura a piena risoluzione lo schermo che contiene il punto indicato
+async function captureDisplayAtPoint(dipPoint) {
+  const display = screen.getDisplayNearestPoint(dipPoint);
+  const thumbnailSize = {
+    width: Math.round(display.size.width * display.scaleFactor),
+    height: Math.round(display.size.height * display.scaleFactor),
+  };
+  const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize });
+  const source = sources.find((s) => s.display_id === String(display.id)) || sources[0];
+  if (!source) return null;
+  return {
+    dataUrl: source.thumbnail.toDataURL(),
+    nx: (dipPoint.x - display.bounds.x) / display.bounds.width,
+    ny: (dipPoint.y - display.bounds.y) / display.bounds.height,
+  };
+}
+
+async function handleGlobalInput(kind, dipPoint, withArrow) {
+  if (!autoRecordActive || autoRecordBusy || !mainWin) return;
+
+  const now = Date.now();
+  if (now - lastAutoCaptureAt < AUTO_CAPTURE_COOLDOWN_MS) return;
+
+  // Le interazioni con le finestre di StepSnap non vanno documentate
+  if (withArrow && pointInsideOwnWindows(dipPoint)) return;
+  if (!withArrow && ownWindowFocused()) return;
+
+  autoRecordBusy = true;
+  lastAutoCaptureAt = now;
+  try {
+    const shot = await captureDisplayAtPoint(dipPoint);
+    if (shot && autoRecordActive && mainWin) {
+      mainWin.webContents.send('autorecord:step', {
+        kind,
+        dataUrl: shot.dataUrl,
+        click: withArrow ? { nx: shot.nx, ny: shot.ny } : null,
+      });
+    }
+  } catch (err) {
+    console.error('Errore cattura registrazione automatica:', err);
+  } finally {
+    autoRecordBusy = false;
+  }
+}
+
+ipcMain.handle('autorecord:start', () => {
+  if (!loadUiohook()) return false;
+  const { uIOhook, UiohookKey } = uiohookLib;
+
+  if (!uiohookListenersAttached) {
+    uIOhook.on('mousedown', (e) => {
+      if (e.button !== 1) return; // solo tasto sinistro
+      handleGlobalInput('click', toDipPoint(e.x, e.y), true);
+    });
+    uIOhook.on('keydown', (e) => {
+      if (e.keycode !== UiohookKey.Enter && e.keycode !== UiohookKey.NumpadEnter) return;
+      // Invio non ha coordinate: cattura lo schermo dove si trova il cursore, senza freccia
+      handleGlobalInput('enter', screen.getCursorScreenPoint(), false);
+    });
+    uiohookListenersAttached = true;
+  }
+
+  try {
+    uIOhook.start();
+  } catch (err) {
+    // start() dopo uno stop() può lamentarsi se il thread è già attivo: non fatale
+    console.warn('uIOhook.start:', err.message);
+  }
+  autoRecordActive = true;
+  return true;
+});
+
+ipcMain.handle('autorecord:stop', () => {
+  autoRecordActive = false;
+  if (uiohookLib) {
+    try { uiohookLib.uIOhook.stop(); } catch (err) { console.warn('uIOhook.stop:', err.message); }
+  }
+  return true;
+});
+
+// ---------------------------------------------------------------------------
 // HOTKEY GLOBALE DI SISTEMA (cattura anche quando StepSnap non ha il focus)
 // ---------------------------------------------------------------------------
 
@@ -209,4 +331,8 @@ app.on('window-all-closed', () => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+  autoRecordActive = false;
+  if (uiohookLib) {
+    try { uiohookLib.uIOhook.stop(); } catch { /* hook già fermo */ }
+  }
 });

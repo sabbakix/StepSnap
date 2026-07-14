@@ -36,6 +36,10 @@
 }
 
 .pip-snap-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background-color: #7c3aed;
   color: white;
   border: none;

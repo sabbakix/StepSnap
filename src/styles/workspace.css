@@ -207,7 +207,9 @@
 }
 
 .step-item-thumb-placeholder {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-muted);
 }
 
@@ -284,9 +286,8 @@
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  font-size: 11px;
-  padding: 1px;
-  border-radius: 2px;
+  padding: 4px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;

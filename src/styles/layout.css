@@ -55,6 +55,9 @@
 }
 
 .toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 13px;
   color: var(--text-secondary);
   font-weight: 500;
@@ -125,7 +128,6 @@ input:checked + .slider:before {
   border: 1px solid transparent;
   cursor: pointer;
   transition: var(--transition);
-  outline: none;
 }
 
 .btn-block {

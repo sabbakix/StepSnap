@@ -14,6 +14,7 @@ import { initDashboard, loadDashboard } from './guides/dashboard.js';
 import { initSteps } from './guides/steps.js';
 import { initEditor } from './editor/canvas.js';
 import { initCapture } from './capture/capture.js';
+import { initAutoRecord } from './capture/autorecord.js';
 import { initExports } from './exports/index.js';
 import { initJsonImport } from './exports/json.js';
 import { initScrollView } from './scrollview/scrollview.js';
@@ -32,6 +33,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initSteps();
   initEditor();
   initCapture();
+  initAutoRecord();
   initExports();
   initJsonImport();
   initScrollView();

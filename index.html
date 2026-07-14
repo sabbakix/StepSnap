@@ -58,7 +58,13 @@
         Istruzioni
       </button>
       <div class="theme-toggle">
-        <span class="toggle-label">🌙 Dark Mode</span>
+        <span class="toggle-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          Dark Mode
+        </span>
         <label class="switch">
           <input type="checkbox" id="themeToggleCheckbox">
           <span class="slider round"></span>
@@ -387,6 +393,23 @@
               </div>
             </div>
 
+            <!-- REGISTRAZIONE AUTOMATICA DEI CLIC (app desktop) -->
+            <div class="autorecord-box">
+              <button class="btn btn-danger-outline btn-block" id="btnAutoRecord"
+                title="Crea automaticamente un passaggio a ogni clic del mouse o pressione di Invio, con freccia sul punto cliccato (app desktop)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"></circle>
+                </svg>
+                Registra Clic Automatici
+              </button>
+              <p class="help-text autorecord-hint hidden" id="autoRecordHint">
+                <span class="rec-dot"></span> In registrazione: ogni clic del mouse o <strong>Invio</strong> crea un
+                passaggio con la freccia sul punto cliccato. I clic sulle finestre di StepSnap vengono ignorati.
+              </p>
+            </div>
+
             <!-- STATO CATTURA DISATTIVA -->
             <div class="capture-inactive" id="captureInactive">
               <p class="card-description">Collega la registrazione per catturare screenshot in tempo reale direttamente
@@ -424,7 +447,12 @@
 
               <div class="capture-buttons-grid">
                 <button class="btn btn-primary btn-block" id="btnSnap">
-                  📸 CATTURA PASSO (<span id="hotkeyDisplay">Ctrl + Space</span>)
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  CATTURA PASSO (<span id="hotkeyDisplay">Ctrl + Space</span>)
                 </button>
 
                 <button class="btn btn-secondary btn-block" id="btnStartPip"
@@ -463,19 +491,45 @@
             <div class="export-buttons-stack">
               <button class="btn btn-success btn-block" id="btnExportHtml"
                 title="Genera un singolo file HTML interattivo con immagini incluse">
-                📄 Esporta HTML Autonomo
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                Esporta HTML Autonomo
               </button>
               <button class="btn btn-secondary btn-block" id="btnPrintPdf"
                 title="Salva come PDF o Stampa la guida tramite browser">
-                🖨️ Salva come PDF / Stampa
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Salva come PDF / Stampa
               </button>
               <button class="btn btn-secondary btn-block" id="btnExportMarkdown"
                 title="Genera file Markdown con immagini in base64">
-                📝 Esporta come Markdown
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Esporta come Markdown
               </button>
               <button class="btn btn-secondary-outline btn-block btn-sm" id="btnExportJson"
                 title="Esporta file di backup modificabile per riaprirlo su StepSnap">
-                💾 Esporta Progetto (JSON)
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                Esporta Progetto (JSON)
               </button>
             </div>
           </div>
@@ -524,12 +578,14 @@
             <ul>
               <li>Seleziona ciascun passaggio creato.</li>
               <li>Aggiungi un titolo descrittivo e le istruzioni dettagliate.</li>
-              <li>Usa l'editor grafico per posizionare **Frecce** colorate, **Rettangoli** per evidenziare bottoni, o
-                usa lo strumento **Pixelazione** per censurare dati personali e password.</li>
+              <li>Usa l'editor grafico per posizionare <strong>Frecce</strong> colorate, <strong>Rettangoli</strong> per
+                evidenziare bottoni, o usa lo strumento <strong>Pixelazione</strong> per censurare dati personali e
+                password.</li>
             </ul>
           </li>
-          <li><strong>Esporta:</strong> Una volta finito, esporta in **HTML Autonomo** (un singolo file leggero che puoi
-            inviare via mail a colleghi, completo di immagini e stili) o in **PDF** tramite la funzione Stampa.</li>
+          <li><strong>Esporta:</strong> Una volta finito, esporta in <strong>HTML Autonomo</strong> (un singolo file
+            leggero che puoi inviare via mail a colleghi, completo di immagini e stili) o in <strong>PDF</strong>
+            tramite la funzione Stampa.</li>
         </ol>
 
         <div class="alert alert-info">

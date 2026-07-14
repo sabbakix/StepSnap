@@ -1,15 +1,15 @@
 import { state } from '../state.js';
-import { saveCurrentSession } from '../storage/db.js';
+import { saveCurrentSession, flushPendingSave, dbGetSession, dbSaveSession } from '../storage/db.js';
 import { escapeHtml } from '../utils.js';
 import { showToast } from '../ui/toast.js';
-import { showConfirm } from '../ui/modals.js';
 import { loadStepImage } from '../editor/canvas.js';
 import { isCropActive } from '../editor/canvas.js';
 import { disableCropMode } from '../editor/crop.js';
 import { undo, redo } from '../editor/history.js';
 import { stopScreenCapture } from '../capture/capture.js';
+import { stopAutoRecord } from '../capture/autorecord.js';
 import { loadDashboard } from './dashboard.js';
-import { enterScrollView, exitScrollView, highlightSidebarStep } from '../scrollview/scrollview.js';
+import { enterScrollView, exitScrollView, renderScrollView, updateScrollViewStepCard, highlightSidebarStep } from '../scrollview/scrollview.js';
 
 // AZIONI WORKSPACE
 export function openWorkspace() {
@@ -32,10 +32,13 @@ export function openWorkspace() {
   }
 }
 
-export function closeWorkspace() {
+export async function closeWorkspace() {
   if (state.scrollViewMode) exitScrollView(true);
+  // Scrive subito eventuali modifiche in attesa (il salvataggio è debounced)
+  await flushPendingSave();
   state.currentSession = null;
   state.selectedStepId = null;
+  stopAutoRecord();
   stopScreenCapture();
   loadDashboard();
 }
@@ -54,6 +57,17 @@ export function createNewStep(imageDataUrl = null) {
   };
 }
 
+// Segnaposto per passi senza immagine (sidebar e vista scorrimento)
+export const THUMB_PLACEHOLDER_HTML = `
+  <div class="step-item-thumb-placeholder">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+      <polyline points="21 15 16 10 5 21"></polyline>
+    </svg>
+  </div>`;
+
 // RENDERING SIDEBAR PASSAGGI
 export function renderStepsList() {
   const stepsList = document.getElementById('stepsList');
@@ -69,7 +83,7 @@ export function renderStepsList() {
     card.setAttribute('draggable', 'true');
 
     // Anteprima Immagine
-    let thumbHtml = '<div class="step-item-thumb-placeholder">📄</div>';
+    let thumbHtml = THUMB_PLACEHOLDER_HTML;
     if (step.image) {
       thumbHtml = `<img src="${step.image}" alt="Anteprima">`;
     }
@@ -90,8 +104,13 @@ export function renderStepsList() {
         <span class="step-item-title">${escapeHtml(step.title || "Passaggio vuoto")}</span>
       </div>
       <div class="step-item-actions">
-        <button class="btn-step-control delete" onclick="deleteStep('${step.id}', event)" title="Elimina passaggio">
-          🗑️
+        <button class="btn-step-control delete" onclick="deleteStep('${step.id}', event)" title="Elimina passaggio"
+          aria-label="Elimina passaggio">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
         </button>
       </div>
     `;
@@ -115,35 +134,72 @@ export function moveStep(index, direction) {
   }
 }
 
-// Cancellazione passaggio
-export async function deleteStep(id, event) {
+// Cancellazione passaggio: immediata, con "Annulla" nel toast per ripristinare
+export function deleteStep(id, event) {
   if (event) event.stopPropagation();
-  const ok = await showConfirm("Vuoi eliminare questo passaggio?", {
-    confirmText: 'Elimina Passaggio',
-    isDanger: true
-  });
-  if (ok) {
-    const index = state.currentSession.steps.findIndex(s => s.id === id);
-    if (index !== -1) {
-      state.currentSession.steps.splice(index, 1);
 
-      if (state.selectedStepId === id) {
-        state.selectedStepId = null;
-        if (state.currentSession.steps.length > 0) {
-          // Seleziona il passo vicino
-          const nextIndex = Math.min(index, state.currentSession.steps.length - 1);
-          selectStep(state.currentSession.steps[nextIndex].id);
-        } else {
-          showEmptyEditor();
-        }
-      } else {
-        renderStepsList();
-      }
+  const index = state.currentSession.steps.findIndex(s => s.id === id);
+  if (index === -1) return;
 
-      saveCurrentSession();
-      showToast("Passaggio eliminato.");
+  const [removed] = state.currentSession.steps.splice(index, 1);
+  const sessionId = state.currentSession.id;
+  const wasScrollView = state.scrollViewMode;
+  const wasSelected = state.selectedStepId === id;
+  if (wasSelected) state.selectedStepId = null;
+
+  renderStepsList();
+
+  if (state.scrollViewMode) {
+    if (state.currentSession.steps.length === 0) {
+      exitScrollView(true);
+      showEmptyEditor();
+    } else {
+      renderScrollView();
+    }
+  } else if (wasSelected) {
+    if (state.currentSession.steps.length > 0) {
+      // Seleziona il passo vicino
+      const nextIndex = Math.min(index, state.currentSession.steps.length - 1);
+      selectStep(state.currentSession.steps[nextIndex].id);
+    } else {
+      showEmptyEditor();
     }
   }
+
+  saveCurrentSession();
+
+  showToast("Passaggio eliminato.", false, {
+    actionText: 'Annulla',
+    onAction: async () => {
+      // Caso normale: la stessa guida è ancora aperta, ripristina in place
+      if (state.currentSession && state.currentSession.id === sessionId) {
+        const steps = state.currentSession.steps;
+        steps.splice(Math.min(index, steps.length), 0, removed);
+        renderStepsList();
+
+        if (state.scrollViewMode) {
+          renderScrollView();
+        } else if (wasScrollView) {
+          // La vista scorrimento era stata chiusa eliminando l'ultimo passo
+          enterScrollView();
+        }
+        selectStep(removed.id);
+        saveCurrentSession();
+        return;
+      }
+
+      // Guida chiusa nel frattempo: ripristina direttamente nell'archivio locale
+      const sess = await dbGetSession(sessionId);
+      if (!sess) return;
+      sess.steps.splice(Math.min(index, sess.steps.length), 0, removed);
+      sess.updatedAt = new Date().toISOString();
+      await dbSaveSession(sess);
+      showToast("Passaggio ripristinato nella guida.");
+      if (document.getElementById('dashboardSection').classList.contains('active')) {
+        loadDashboard(); // aggiorna conteggio passi e miniatura della card
+      }
+    }
+  });
 }
 
 // Selezione del passaggio
@@ -192,6 +248,40 @@ export function showEmptyEditor() {
   state.selectedStepId = null;
 }
 
+// Assegna un'immagine a un passo esistente e aggiorna la vista corrente
+export function setStepImage(step, dataUrl) {
+  step.rawImage = dataUrl;
+  step.image = dataUrl;
+  step.annotations = [];
+
+  renderStepsList();
+  if (state.scrollViewMode) {
+    updateScrollViewStepCard(step.id);
+  } else {
+    loadStepImage(step);
+  }
+  saveCurrentSession();
+}
+
+// Aggiunge un passo in coda e lo mostra nella vista corrente.
+// La Vista Scorrimento è quella predefinita: vi si entra al primo passo creato.
+export function appendStep(step) {
+  state.currentSession.steps.push(step);
+  renderStepsList();
+
+  if (state.scrollViewMode) {
+    renderScrollView();
+  } else if (state.currentSession.steps.length === 1) {
+    enterScrollView();
+  }
+  selectStep(step.id);
+  saveCurrentSession();
+
+  // Scroll sidebar al fondo
+  const stepsList = document.getElementById('stepsList');
+  stepsList.scrollTop = stepsList.scrollHeight;
+}
+
 // CATTURA IMMAGINE O UPLOAD NEL CANVAS
 export function handleImageUpload(dataUrl) {
   if (!state.currentSession) {
@@ -203,28 +293,14 @@ export function handleImageUpload(dataUrl) {
   if (state.selectedStepId) {
     const step = state.currentSession.steps.find(s => s.id === state.selectedStepId);
     if (step && !step.rawImage) {
-      step.rawImage = dataUrl;
-      step.image = dataUrl;
-      step.annotations = [];
-      loadStepImage(step);
-      renderStepsList();
-      saveCurrentSession();
+      setStepImage(step, dataUrl);
       showToast("Immagine assegnata al passaggio!");
       return;
     }
   }
 
   // Altrimenti, crea un nuovo passo alla fine
-  const newStep = createNewStep(dataUrl);
-  state.currentSession.steps.push(newStep);
-  renderStepsList();
-  selectStep(newStep.id);
-  saveCurrentSession();
-
-  // Scroll sidebar al fondo
-  const stepsList = document.getElementById('stepsList');
-  stepsList.scrollTop = stepsList.scrollHeight;
-
+  appendStep(createNewStep(dataUrl));
   showToast("Nuovo passaggio creato con l'immagine!");
 }
 
@@ -285,26 +361,10 @@ export function initSteps() {
   window.deleteStep = deleteStep;
   window.moveStep = moveStep;
 
-  // Navigazione
-  document.getElementById('btnDashboard').addEventListener('click', async () => {
-    if (state.currentSession) {
-      const ok = await showConfirm("Il tuo lavoro è salvato automaticamente. Vuoi tornare alla dashboard?", {
-        confirmText: 'Torna alla Dashboard',
-        cancelText: 'Rimani'
-      });
-      if (ok) closeWorkspace();
-    } else {
-      closeWorkspace();
-    }
-  });
-
-  document.getElementById('btnBackToDashboard').addEventListener('click', async () => {
-    const ok = await showConfirm("Il tuo lavoro è salvato automaticamente. Vuoi tornare alla dashboard?", {
-      confirmText: 'Torna alla Dashboard',
-      cancelText: 'Rimani'
-    });
-    if (ok) closeWorkspace();
-  });
+  // Navigazione: il lavoro è salvato automaticamente, si torna alla dashboard senza conferme
+  document.getElementById('btnDashboard').addEventListener('click', closeWorkspace);
+  document.getElementById('btnBackToDashboard').addEventListener('click', closeWorkspace);
+  document.getElementById('headerLogo').addEventListener('click', closeWorkspace);
 
   // Modifica testi live con auto-save
   const activeTitle = document.getElementById('activeGuideTitle');
@@ -326,15 +386,7 @@ export function initSteps() {
   // Aggiungi passo vuoto
   document.getElementById('btnAddEmptyStep').addEventListener('click', () => {
     if (!state.currentSession) return;
-    const newStep = createNewStep();
-    state.currentSession.steps.push(newStep);
-    renderStepsList();
-    selectStep(newStep.id);
-    saveCurrentSession();
-
-    // Auto-scroll sidebar al fondo
-    const stepsList = document.getElementById('stepsList');
-    stepsList.scrollTop = stepsList.scrollHeight;
+    appendStep(createNewStep());
   });
 
   // Modifiche Dettagli Passo (Titolo, Descrizione)

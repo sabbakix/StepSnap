@@ -2,7 +2,7 @@ import { state } from '../state.js';
 import { escapeHtml } from '../utils.js';
 import { showToast } from '../ui/toast.js';
 import { saveCurrentSession } from '../storage/db.js';
-import { selectStep, showEmptyEditor } from '../guides/steps.js';
+import { selectStep, showEmptyEditor, THUMB_PLACEHOLDER_HTML } from '../guides/steps.js';
 import { saveFlattenedImage } from '../editor/canvas.js';
 
 // Stato interno Vista Scorrimento
@@ -93,7 +93,7 @@ export function exitScrollView(silent = false) {
   }
 }
 
-function renderScrollView() {
+export function renderScrollView() {
   const container = document.getElementById('scrollViewContainer');
   container.innerHTML = '';
   container.classList.remove('hidden');
@@ -226,7 +226,7 @@ function closeSvImageEditor() {
   svEditOriginalParent = null;
 }
 
-function updateScrollViewStepCard(stepId) {
+export function updateScrollViewStepCard(stepId) {
   const step = state.currentSession.steps.find(s => s.id === stepId);
   if (!step) return;
 
@@ -268,7 +268,7 @@ function updateScrollViewStepCard(stepId) {
   if (thumb) {
     thumb.innerHTML = step.image
       ? `<img src="${step.image}" alt="Anteprima">`
-      : '<div class="step-item-thumb-placeholder">📄</div>';
+      : THUMB_PLACEHOLDER_HTML;
   }
 }
 

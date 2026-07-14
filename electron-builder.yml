@@ -8,6 +8,14 @@ files:
   - dist/**
   - electron/**
 
+# Il modulo nativo dell'hook di input globale deve restare fuori dall'asar
+asarUnpack:
+  - node_modules/uiohook-napi/**
+
+# Il modulo nativo dell'hook di input deve restare fuori dall'archivio asar
+asarUnpack:
+  - node_modules/uiohook-napi/**
+
 # electron-builder converte automaticamente build/icon.png (512px)
 # in .ico per Windows e .icns per macOS.
 win:
