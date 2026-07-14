@@ -85,7 +85,7 @@ export function renderStepsList() {
     // Anteprima Immagine
     let thumbHtml = THUMB_PLACEHOLDER_HTML;
     if (step.image) {
-      thumbHtml = `<img src="${step.image}" alt="Anteprima">`;
+      thumbHtml = `<img src="${escapeHtml(step.image)}" alt="Anteprima">`;
     }
 
     card.innerHTML = `

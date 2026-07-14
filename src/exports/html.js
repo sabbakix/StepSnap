@@ -17,7 +17,7 @@ export async function exportHtmlFile() {
   session.steps.forEach((step, index) => {
     const descHtml = parseMarkdown(step.description);
     const imgHtml = step.image
-      ? `<div class="step-image"><img src="${step.image}" alt="Passo ${index + 1}"></div>`
+      ? `<div class="step-image"><img src="${escapeHtml(step.image)}" alt="Passo ${index + 1}"></div>`
       : '<div class="step-image-empty">Nessuna schermata associata.</div>';
 
     stepsHtml += `

@@ -56,6 +56,13 @@ non supporta `getWindowForTarget`/`setWindowBounds`: spostare la finestra via Po
 L'app usa l'IndexedDB reale dell'utente: niente `clearDataForOrigin`; creare una guida
 di test con titolo univoco ed eliminarla a fine verifica dalla dashboard.
 
+Per la build release: `npm run dist:win` (electron-builder ha `npmRebuild: false`
+perché uiohook-napi usa prebuild N-API e questa macchina non ha Visual Studio).
+L'app pacchettizzata si verifica con lo stesso flusso CDP:
+`release/win-unpacked/StepSnap.exe --remote-debugging-port=9555` (sempre con
+ELECTRON_RUN_AS_NODE deselezionata). ATTENZIONE: il processo si chiama `StepSnap`,
+non `electron` — cercare la finestra con `Get-Process electron, StepSnap`.
+
 Per testare la registrazione automatica (uiohook) servono input REALI del SO:
 `mouse_event`/`SendInput` via PowerShell li genera e l'hook li vede; **`SetCursorPos`
 NON genera eventi** per gli hook low-level (usalo solo per posizionare il cursore prima

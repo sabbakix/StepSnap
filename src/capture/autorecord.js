@@ -1,7 +1,7 @@
 import { state } from '../state.js';
 import { platform } from '../platform/index.js';
 import { showToast } from '../ui/toast.js';
-import { showAlert } from '../ui/modals.js';
+import { showAlert, showConfirm } from '../ui/modals.js';
 import { createNewStep, appendStep } from '../guides/steps.js';
 import { drawShape } from '../editor/shapes.js';
 
@@ -30,6 +30,16 @@ async function startAutoRecord() {
     );
     return;
   }
+
+  const consent = await showConfirm(
+    "Mentre la registrazione è attiva, StepSnap cattura uno screenshot dell'intero schermo " +
+    "a ogni clic del mouse o pressione di Invio, in QUALSIASI applicazione tu stia usando " +
+    "(non solo StepSnap). Se sullo schermo compaiono password, dati bancari o altre " +
+    "informazioni sensibili in quel momento, verranno salvate come immagine nella guida, " +
+    "solo in locale su questo computer. Vuoi avviare la registrazione?",
+    { confirmText: 'Avvia Registrazione', cancelText: 'Annulla' }
+  );
+  if (!consent) return;
 
   const ok = await platform.startClickRecording(onAutoRecordStep);
   if (!ok) {

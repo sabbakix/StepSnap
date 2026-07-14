@@ -5,6 +5,37 @@ import { showAlert } from '../ui/modals.js';
 import { downloadFile, sessionFilename } from './download.js';
 import { openWorkspace } from '../guides/steps.js';
 
+// Un file .json importato è l'unica fonte di dati non generati internamente
+// dall'app: i campi non vengono mai fidati così come sono, per evitare che un
+// progetto malevolo inietti markup/JS tramite id o immagini malformate nei
+// punti in cui questi valori finiscono in innerHTML.
+const DATA_IMAGE_RE = /^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/]+=*$/;
+
+function sanitizeImportedImage(value) {
+  return typeof value === 'string' && DATA_IMAGE_RE.test(value) ? value : null;
+}
+
+function sanitizeImportedSession(raw) {
+  const now = Date.now();
+
+  return {
+    id: 'session_' + now, // mai quello del file: evita di sovrascrivere guide esistenti con lo stesso id
+    title: String(raw.title),
+    description: typeof raw.description === 'string' ? raw.description : '',
+    createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toLocaleString('it-IT'),
+    steps: raw.steps.map((step, index) => ({
+      id: `step_${now}_${index}_${Math.floor(Math.random() * 1000)}`,
+      title: typeof step?.title === 'string' ? step.title : '',
+      description: typeof step?.description === 'string' ? step.description : '',
+      rawImage: sanitizeImportedImage(step?.rawImage),
+      image: sanitizeImportedImage(step?.image),
+      annotations: Array.isArray(step?.annotations)
+        ? step.annotations.filter(a => a && typeof a === 'object' && typeof a.type === 'string')
+        : [],
+    })),
+  };
+}
+
 // Esporta file JSON di progetto modificabile
 export function exportJsonFile() {
   if (!state.currentSession) return;
@@ -26,9 +57,10 @@ export function importJsonProject(file) {
 
       // Controllo validità minimale
       if (session.id && session.title && Array.isArray(session.steps)) {
-        session.updatedAt = new Date().toISOString();
-        await dbSaveSession(session);
-        state.currentSession = session;
+        const sanitized = sanitizeImportedSession(session);
+        sanitized.updatedAt = new Date().toISOString();
+        await dbSaveSession(sanitized);
+        state.currentSession = sanitized;
         state.selectedStepId = null;
 
         openWorkspace();

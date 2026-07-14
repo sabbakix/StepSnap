@@ -105,7 +105,7 @@ export function renderScrollView() {
 
     const imgSection = step.image
       ? `<div class="scroll-view-img-wrapper">
-           <img src="${step.image}" alt="Passo ${index + 1}">
+           <img src="${escapeHtml(step.image)}" alt="Passo ${index + 1}">
            <button class="btn btn-secondary btn-sm scroll-view-edit-img-btn" data-id="${step.id}">
              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -246,7 +246,7 @@ export function updateScrollViewStepCard(stepId) {
   if (step.image) {
     newSection.className = 'scroll-view-img-wrapper';
     newSection.innerHTML = `
-      <img src="${step.image}" alt="Passo ${idx + 1}">
+      <img src="${escapeHtml(step.image)}" alt="Passo ${idx + 1}">
       <button class="btn btn-secondary btn-sm scroll-view-edit-img-btn" data-id="${step.id}">
         ${editBtnSvg} Modifica annotazioni
       </button>`;
@@ -267,7 +267,7 @@ export function updateScrollViewStepCard(stepId) {
   const thumb = document.querySelector(`.step-item-card[data-id="${stepId}"] .step-item-thumb`);
   if (thumb) {
     thumb.innerHTML = step.image
-      ? `<img src="${step.image}" alt="Anteprima">`
+      ? `<img src="${escapeHtml(step.image)}" alt="Anteprima">`
       : THUMB_PLACEHOLDER_HTML;
   }
 }

@@ -16,7 +16,7 @@ export function printPdf() {
     <h1>${escapeHtml(session.title)}</h1>
     <p>${escapeHtml(session.description || "Nessuna descrizione del processo fornita.")}</p>
     <div style="font-size: 11px; color: #666; margin-top: 10px; display: flex; justify-content: space-between;">
-      <span>Data Documentazione: ${session.createdAt}</span>
+      <span>Data Documentazione: ${escapeHtml(session.createdAt)}</span>
       <span>Passaggi totali: ${session.steps.length}</span>
     </div>
   `;
@@ -28,7 +28,7 @@ export function printPdf() {
 
     const descHtml = parseMarkdown(step.description);
     const imgHtml = step.image
-      ? `<div class="print-step-img-container"><img src="${step.image}" alt="Passo ${index + 1}"></div>`
+      ? `<div class="print-step-img-container"><img src="${escapeHtml(step.image)}" alt="Passo ${index + 1}"></div>`
       : '<div style="padding: 10px; border: 1px dashed #ccc; text-align: center; color: #666; font-size: 12px;">Nessuna schermata.</div>';
 
     stepEl.innerHTML = `
